@@ -45,8 +45,8 @@ class Shogi():
             is_now_fallen = not (0 <= xy2[0] <= 8 and 0 <= xy2[1] <= 8)
             flags2['is_fallen'] = flags2['is_fallen'] or is_now_fallen
             if not is_now_fallen:
-                flags2['got_king'] = flags2['got_king'] or (Shogi.board[xy2[1]*9+xy2[0]] == 2)
-                flags2['killed_friend'] = flags2['killed_friend'] or (Shogi.board[xy2[1]*9+xy2[0]] == 1)
+                flags2['got_king'] = flags2['got_king'] or (Shogi.board[xy2[0]*9+xy2[1]] == 2)
+                flags2['killed_friend'] = flags2['killed_friend'] or (Shogi.board[xy2[0]*9+xy2[1]] == 1)
             sub_num_failures = self.step(xy2, flags2, depth+1)
             num_failures = num_failures + sub_num_failures
 
@@ -55,7 +55,7 @@ class Shogi():
 
     def run(self):
         initial_flags = {'got_king': False, 'is_fallen': False, 'killed_friend': False}
-        num_failures = self.step((5, 5), initial_flags, 0)
+        num_failures = self.step((4, 4), initial_flags, 0)
         num_all_candidates = 5 ** Shogi.max_depth
         num_successes = num_all_candidates - num_failures
         result = num_successes/float(num_all_candidates)
