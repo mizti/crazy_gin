@@ -36,9 +36,10 @@ class Shogi():
     @memoize
     def step(self, xy, flags, depth):
         if depth >= Shogi.max_depth:
-            return int(not (flags['got_king'] and not flags['is_fallen'] and not flags['killed_friend']))
+            is_accepted = flags['got_king'] and not flags['is_fallen'] and not flags['killed_friend']
+            return int(is_accepted)
 
-        num_failures = 0
+        num_accepted = 0
         for move in Shogi.moves:
             flags2 = dict(flags)
             xy2 = (xy[0] + move[0], xy[1] + move[1])
@@ -47,19 +48,18 @@ class Shogi():
             if not is_now_fallen:
                 flags2['got_king'] = flags2['got_king'] or (Shogi.board[xy2[0]*9+xy2[1]] == 2)
                 flags2['killed_friend'] = flags2['killed_friend'] or (Shogi.board[xy2[0]*9+xy2[1]] == 1)
-            sub_num_failures = self.step(xy2, flags2, depth+1)
-            num_failures = num_failures + sub_num_failures
+            num_accepted_sub = self.step(xy2, flags2, depth+1)
+            num_accepted = num_accepted + num_accepted_sub
 
-        print >>sys.stderr, '[DEBUG] depth = %d, \txy = %s, \tnum_failures = %d' % (depth, xy, num_failures)
-        return num_failures
+        print >>sys.stderr, '[DEBUG] depth = %d, \txy = %s, \tnum_accepted = %d' % (depth, xy, num_accepted)
+        return num_accepted
 
     def run(self):
         initial_flags = {'got_king': False, 'is_fallen': False, 'killed_friend': False}
-        num_failures = self.step((4, 4), initial_flags, 0)
+        num_accepted = self.step((4, 4), initial_flags, 0)
         num_all_candidates = 5 ** Shogi.max_depth
-        num_successes = num_all_candidates - num_failures
-        result = num_successes/float(num_all_candidates)
-        print '%d / %d = %f' % (num_successes, num_all_candidates, result)
+        result = num_accepted/float(num_all_candidates)
+        print '%d / %d = %f' % (num_accepted, num_all_candidates, result)
 
 if __name__ == '__main__':
     Shogi().run()
